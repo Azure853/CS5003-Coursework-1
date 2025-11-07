@@ -1,3 +1,13 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ */
+
+package com.mycompany.cs5003cw1;
+
+/**
+ *
+ * @author Daniel O'Sullivan
+ */
 
 import java.time.LocalDate;
 
@@ -27,7 +37,7 @@ public class Product {
         nextProductId++;
         this.name = name;
         this.quantity = quantity;
-        this.entryDate = LocalDate.now();
+        entryDate = LocalDate.now();
         activities = new Activity[4];
         
     }
