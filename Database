@@ -1,0 +1,66 @@
+
+
+import java.util.ArrayList;
+
+public class Database {
+    
+    private final ArrayList<Product> products = new ArrayList<>();
+    
+    public void displayAll()
+    {
+        for (Product product1 : products)
+        {
+            product1.display();
+            System.out.println("-----------");
+            
+        }
+    }
+    
+    public void addProduct(String name, int quantity)
+    {
+        if (quantity < 0) // Can only add a positive number of products
+        {
+            System.out.println("Error: Quantity cannot be negative.");
+            return;        
+        }
+        Product latest = new Product(name, quantity);
+        products.add(latest);
+        Activity mostRecent = new Activity("AddToStock", quantity);
+        latest.addActivity(mostRecent);
+    }
+    
+    public void deleteProduct(int ID)
+    {
+       for (int i =0; i< products.size(); i++)
+       {
+           if (products.get(i).getProductId() == ID)
+           {
+               products.remove(i);
+               System.out.println("Product " + ID + "deleted successfully");
+               return;
+           }
+       }
+       System.out.println("Product not found.");
+    }
+    
+    public void displayMostRecentActivities(int ID)
+    {
+      for (Product product1 : products)
+      {
+          if (product1.getProductId() == ID)
+          {
+              System.out.println("Activities for Product " + ID + ":");
+              for (Activity a : product1.getActivities())
+              {
+                  if (a != null)
+                  {
+                      a.display();
+                      System.out.println("-----------");
+                  }
+              }
+              return;
+          }
+      }
+      System.out.println("Product not found.");
+    }
+}
