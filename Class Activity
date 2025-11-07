@@ -1,0 +1,75 @@
+
+import java.time.LocalDate;
+
+public class Activity {
+    
+    // Fields
+    
+    public static int nextActivityId = 1;
+    
+    private int activityId;
+    
+    private String activityName;
+    
+    private LocalDate activityDate;
+    
+    private int activityQuantity;
+    
+    // Constructor
+    
+    public Activity(String activityName, int activityQuantity)
+    {
+        if (activityQuantity < 0)
+        {
+            throw new IllegalArgumentException("Activity quantity cannot be negative");
+        }
+        
+        if (!activityName.equals("AddToStock") && !activityName.equals("RemoveFromStock"))
+        {
+            throw new IllegalArgumentException("Activity name must be AddToStock or RemoveFromStock");
+        }
+        activityId = nextActivityId;
+        
+        nextActivityId++;
+        
+        this.activityName = activityName;
+        
+        activityDate = LocalDate.now();
+        
+        this.activityQuantity = activityQuantity;
+       
+    }
+    
+    // Methods
+    
+    // Getters
+    
+    public int getActivityId()
+    {
+        return activityId;
+    }
+    
+    public String getActivityName()
+            {
+                return activityName;
+            }
+    
+    public LocalDate getActivityDate()
+    {
+        return activityDate;
+    }
+    
+    public int getActivityQuantity()
+    {
+        return activityQuantity;
+    }
+    
+    public void display()
+    {
+        System.out.println("Activity ID: " + activityId);
+        System.out.println("Name: " + activityName);
+        System.out.println("Quantity: " + activityQuantity);
+        System.out.println("Date: " + activityDate);
+    }
+    
+}
