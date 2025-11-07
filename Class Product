@@ -41,12 +41,12 @@ public class Product {
                 return productId;
             }
     
-    public String getName()
+    public String getProductName()
     {
         return productName;
     }
     
-    public int getQuantity()
+    public int getProductQuantity()
     {
         return productQuantity;
     }
@@ -63,7 +63,7 @@ public class Product {
     
     // Setters
     
-    public void setQuantity(int quantity)
+    public void setProductQuantity(int quantity)
     {
         productQuantity = quantity;
     }
