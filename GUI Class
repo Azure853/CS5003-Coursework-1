@@ -1,0 +1,188 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package CS5003;
+
+/**
+ *
+ * @author Daniel
+ */
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+
+public class ProductGUI extends JFrame {
+    
+    private Database database = new Database();
+    
+    // Inputs
+    
+    private final JTextField nameField = new JTextField(12);
+    private final JTextField qtyField = new JTextField(6);
+    private final JTextField idField = new JTextField(6);
+    private final JTextField actQtyField = new JTextField(6);
+    private final JComboBox<String> actTypeBox = new JComboBox<>(new String[]{"AddToStock", "RemoveFromStock"});
+    
+    // Output area
+    
+    private final JTextArea output = new JTextArea(16,60);
+    
+    public ProductGUI()
+    {
+        super("Product Manager");
+        
+        setLayout(new GridLayout(0, 1, 5, 5));
+        
+        // Row 1: Add product
+        JPanel addPanel = new JPanel();
+        addPanel.add(new JLabel("Name:"));
+        addPanel.add(nameField);
+        addPanel.add(new JLabel("Qty:"));
+        addPanel.add(qtyField);
+        JButton addBtn = new JButton("Add Product");
+        addBtn.addActionListener(this::onAddProduct);
+        addPanel.add(addBtn);
+        add(addPanel);
+        
+        // Row 2: Delete product
+        JPanel deletePanel = new JPanel();
+        deletePanel.add(new JLabel("Product ID:"));
+        deletePanel.add(idField);
+        JButton deleteBtn = new JButton("Delete");
+        deleteBtn.addActionListener(this::onDeleteProduct);
+        deletePanel.add(deleteBtn);
+        add(deletePanel);
+        
+        // Row 3: Add activity
+        JPanel actPanel = new JPanel();
+        actPanel.add(new JLabel("Type:"));
+        actPanel.add(actTypeBox);
+        actPanel.add(new JLabel("Qty:"));
+        actPanel.add(actQtyField);
+        JButton actBtn = new JButton("Apply Activity");
+        actBtn.addActionListener(this::onAddActivity);
+        actPanel.add(actBtn);
+        add(actPanel);
+        
+        // Row 4: Display buttons
+        JPanel dispPanel = new JPanel();
+        JButton showAllBtn = new JButton("Display All");
+        showAllBtn.addActionListener(this::onDisplayAll);
+        JButton showActsBtn = new JButton("Show Last 4 (Sorted)");
+        showActsBtn.addActionListener(this::onShowActivities);
+        dispPanel.add(showAllBtn);
+        dispPanel.add(showActsBtn);
+        add(dispPanel);
+        
+        // Row 5: Save / Load
+        JPanel ioPanel = new JPanel();
+        JButton saveBtn = new JButton("Save");
+       saveBtn.addActionListener(e -> database.saveToFile("database.ser"));
+       JButton loadBtn = new JButton("Load");
+       loadBtn.addActionListener(e -> database = Database.loadFromFile("database.ser"));
+       ioPanel.add(saveBtn);
+       ioPanel.add(loadBtn);
+       add(ioPanel);
+        
+       // Final frame settings
+       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+       pack();
+       setLocationRelativeTo(null);
+       setVisible(true);
+              
+     }
+    
+    // Button HAndlers
+    
+    private void onAddProduct(ActionEvent e)
+    {
+        try { 
+           String name = nameField.getText().trim();
+           int qty = Integer.parseInt(qtyField.getText().trim());
+           database.addProduct(name, qty);
+           System.out.println("Add product: " + name + " (" + qty + ")");
+        } catch (Exception ex)
+        {
+            System.out.println("Invalid input for product");
+        }
+    }
+    
+    private void onDeleteProduct(ActionEvent e)
+    {
+        try 
+        {
+           int id = Integer.parseInt(idField.getText().trim());
+           database.deleteProduct(id);
+        } catch (NumberFormatException ex)
+        {
+            System.out.println("Invalid product ID.");
+        }
+    }
+    
+    private void onAddActivity(ActionEvent e)
+    {
+        try 
+        {
+         int id = Integer.parseInt(idField.getText().trim());
+         int qty = Integer.parseInt(actQtyField.getText().trim());
+         String type = (String) actTypeBox.getSelectedItem();
+         
+         Product p = null;
+         for (Product prod : database.getProducts())
+         {
+             if (prod.getProductId() == id) p = prod;
+         }
+         
+         if (p == null)
+         {
+             System.out.println("Product not found");
+             return;
+         }
+         
+         if ("AddToStock".equals(type))
+         {
+             p.setProductQuantity(p.getProductQuantity() + qty);
+         } 
+         else if ("RemoveFromStock".equals(type))
+         {
+             if (qty > p.getProductQuantity())
+             {
+                 System.out.println("Error: insufficient quantity");
+                 return;
+             }
+             p.setProductQuantity(p.getProductQuantity() - qty);
+         }
+         
+         Activity a = new Activity(type, qty);
+         p.addActivity(a);
+         System.out.println("Applied activity " + type + " (" + qty + ") to product " + id);
+        } catch (Exception ex)
+        {
+            System.out.println("Invalid input for activity");
+        }
+    }
+    
+    private void onDisplayAll(ActionEvent e)
+    {
+        database.displayAll();
+    }
+    
+    private void onShowActivities(ActionEvent e)
+    {
+        try 
+        {
+         int id = Integer.parseInt(idField.getText().trim());
+         database.displayMostRecentActivities(id);
+        } catch (Exception ex) 
+        {
+            System.out.println("Invalid product ID");
+        }
+    }
+    
+    public static void main(String[] args)
+    {
+        new ProductGUI();
+    }
+}
