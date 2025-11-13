@@ -46,14 +46,30 @@ public class Database implements Serializable {
     }
     
     public void deleteProduct(int ID)
+            // Binary search. Note that products are already sorted by ID.
     {
-       for (int i =0; i< products.size(); i++)
+       int left = 0;
+       int right = products.size() - 1;
+       
+       while (left <= right)
        {
-           if (products.get(i).getProductId() == ID)
+           int mid = left + (right - left) / 2;
+           Product midProduct = products.get(mid);
+           int midId = midProduct.getProductId();
+           
+           if (midId == ID)
            {
-               products.remove(i);
+               products.remove(mid);
                System.out.println("Product " + ID + " deleted successfully.");
                return;
+           }
+           else if (midId < ID)
+           {
+               left = mid + 1;
+           }
+           else
+           {
+               right = mid - 1;
            }
        }
        System.out.println("Product not found.");
@@ -76,7 +92,7 @@ public class Database implements Serializable {
                   if (a != null) n++;
               }
               
-              // Merge sort (desccending order by activity quantity)
+              // Merge sort (descending order by activity quantity)
               if (n > 1)
               {
                   mergeSortActivities(acts, 0, n - 1);
