@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.cs5003cw1;
+package CS5003;
 
 /**
  *
@@ -76,21 +76,10 @@ public class Database implements Serializable {
                   if (a != null) n++;
               }
               
-              // Selection sort
-              for (int i=0; i< n - 1; i++)
+              // Merge sort (desccending order by activity quantity)
+              if (n > 1)
               {
-                  int maxIndex = i;
-                  for ( int j = i + 1; j < n; j++)
-                  {
-                      if (acts[j].getActivityQuantity() > acts[maxIndex].getActivityQuantity())
-                      {
-                          maxIndex = j;
-                      }
-                  }
-                  
-                  Activity temp = acts[i];
-                  acts[i] = acts[maxIndex];
-                  acts[maxIndex] = temp;
+                  mergeSortActivities(acts, 0, n - 1);
               }
               
               // Display non-null sorted activities
@@ -150,9 +139,80 @@ public class Database implements Serializable {
                 if (a != null && a.getActivityId() > maxAct) maxAct = a.getActivityId();
             }
         }
-        Product.nextProductId = maxProd +1;
+        Product.nextProductId = maxProd + 1;
         Activity.nextActivityId = maxAct + 1;
     }     
     
+    public java.util.List<Product> getProducts()
+    {
+        return products;
+    }
     
+    private void mergeSortActivities(Activity[] arr, int left, int right)
+    {
+        if (left >= right)
+        {
+           return;
+        }
+        
+        int mid = left + (right - left) / 2;
+        
+        mergeSortActivities(arr, left, mid);
+        mergeSortActivities(arr, mid + 1, right);
+        
+        mergeActivities(arr, left, mid, right);
+                           
+    }
+    
+    private void mergeActivities(Activity[] arr, int left, int mid, int right)
+    {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+        
+        Activity[] L = new Activity[n1];
+        Activity[] R = new Activity[n2];
+        
+        // Copy data to temporary arrays
+        for (int i = 0; i < n1; i++)
+        {
+            L[i] = arr[left + i];
+        }
+        for (int j = 0; j < n2; j++)
+        {
+            R[j] = arr[mid + 1 + j];
+        }
+        
+        int i = 0, j = 0;
+        int k = left;
+        
+        // Merge the two temporary arrays
+        while (i < n1 && j < n2)
+        {
+            if (L[i].getActivityQuantity() >= R[j].getActivityQuantity())
+            {
+                arr[k] = L[i];
+                i++;       
+            }
+            else 
+            {
+                arr[k] = R[j];
+                j++;
+            }
+            k++;
+        }
+        // Copy remaining elements of L[], if any
+        while (i < n1)
+        {
+            arr[k] = L[i];
+            i++;
+            k++;
+        }
+        // Copy remaining elements of R[], if any
+        while (j < n2)
+        {
+            arr[k] = R[j];
+            j++;
+            k++;
+        }
+    }
 }
