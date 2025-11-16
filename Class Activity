@@ -1,4 +1,8 @@
 
+Package CS5003;
+
+// @Authors: Daniel O'Sullivan, Awad Saad, Hardik Prandit
+
 import java.time.LocalDate;
 
 public class Activity {
