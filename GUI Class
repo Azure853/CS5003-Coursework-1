@@ -94,7 +94,7 @@ public class ProductGUI extends JFrame {
               
      }
     
-    // Button HAndlers
+    // Button Handlers
     
     private void onAddProduct(ActionEvent e)
     {
