@@ -6,7 +6,7 @@ package com.mycompany.cs5003cw1;
 
 /**
  *
- * @author Daniel OSullivan
+ * @author Daniel OSullivan, Awad Saad, Hardik Prandit
  */
 
 import java.time.LocalDate;
