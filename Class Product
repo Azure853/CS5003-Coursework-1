@@ -1,7 +1,7 @@
 package CS5003;
 /**
  *
- * @author Daniel OSullivan, Awad Saad, Hardik Prandit
+ * @author Daniel O'Sullivan, Awad Saad, Hardik Prandit
  */
 
 import java.time.LocalDate;
