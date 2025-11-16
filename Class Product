@@ -1,13 +1,22 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ */
+
 package CS5003;
+
 /**
  *
- * @author Daniel O'Sullivan, Awad Saad, Hardik Prandit
+ *  @author Daniel O'Sullivan, Awad Saad, Hardik Prandit
  */
 
 import java.time.LocalDate;
+import java.io.Serializable;
 
-public class Product {
+public class Product implements Serializable {
     
+    // Serial version ID
+    
+    private static final long serialVersionUID = 1L;
     
     // Fields
 
