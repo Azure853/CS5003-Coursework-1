@@ -5,7 +5,7 @@
 package CS5003;
 /**
  *
- *  @author Daniel O'Sullivan, Awad Saad, Hardik Prandit
+ *  @author Daniel O'Sullivan, Awad Saad, Hardik Pandit
  */
 import java.time.LocalDate;
 import java.io.Serializable;
