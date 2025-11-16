@@ -1,11 +1,20 @@
-
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package CS5003;
-
-// @Authors: Daniel O'Sullivan, Awad Saad, Hardik Prandit
-
+/**
+ *
+ *  @author Daniel O'Sullivan, Awad Saad, Hardik Prandit
+ */
 import java.time.LocalDate;
+import java.io.Serializable;
 
-public class Activity {
+public class Activity implements Serializable {
+    
+    // Serial version ID
+    
+    private static final long serialVersionUID = 1L;
     
     // Fields
     
@@ -23,6 +32,9 @@ public class Activity {
     
     public Activity(String activityName, int activityQuantity)
     {
+        
+        // Exception Handling
+        
         if (activityQuantity < 0)
         {
             throw new IllegalArgumentException("Activity quantity cannot be negative");
@@ -32,6 +44,9 @@ public class Activity {
         {
             throw new IllegalArgumentException("Activity name must be AddToStock or RemoveFromStock");
         }
+        
+        // Fields for Constructor
+        
         activityId = nextActivityId;
         
         nextActivityId++;
@@ -54,9 +69,9 @@ public class Activity {
     }
     
     public String getActivityName()
-            {
+    {
                 return activityName;
-            }
+    }
     
     public LocalDate getActivityDate()
     {
@@ -67,6 +82,8 @@ public class Activity {
     {
         return activityQuantity;
     }
+    
+    // Display
     
     public void display()
     {
