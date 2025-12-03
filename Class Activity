@@ -82,15 +82,4 @@ public class Activity implements Serializable {
     {
         return activityQuantity;
     }
-    
-    // Display
-    
-    public void display()
-    {
-        System.out.println("Activity ID: " + activityId);
-        System.out.println("Name: " + activityName);
-        System.out.println("Quantity: " + activityQuantity);
-        System.out.println("Date: " + activityDate);
-    }
-    
 }
