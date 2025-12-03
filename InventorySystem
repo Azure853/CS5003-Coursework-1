@@ -1,0 +1,260 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package CS5003;
+
+/**
+ *
+ *  @author Daniel O'Sullivan, Awad Saad, Hardik Pandit
+ */
+
+import java.util.ArrayList;
+import java.io.*;
+
+public class InventorySystem implements Serializable {
+    
+    // Serial version ID
+    
+    private static final long serialVersionUID = 1L;
+    
+    // Initialise Arraylist
+    
+    private final ArrayList<Product> products = new ArrayList<>();
+    
+    public String displayAll()
+    {
+        if (products.isEmpty())
+        {
+            return "No Products in system.\n";
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        
+        for (Product p : products)
+        {
+            sb.append("Product ID: ").append(p.getProductId()).append("\n");
+            sb.append("Name: ").append(p.getProductName()).append("\n");
+            sb.append("Date Added: ").append(p.getEntryDate()).append("\n");
+            sb.append("Quantity: ").append(p.getProductQuantity()).append("\n");
+            sb.append("-------------------------\n");
+        }
+        return sb.toString();
+    }
+    
+    public String addProduct(String name, int quantity)
+    {
+        if (name == null || name.isBlank()) 
+        {
+         return "Error: product name is required.";
+        }
+            if (quantity < 0)
+            {
+                return "Error: quantity cannot be negative.";
+            }
+            
+        Product latest = new Product(name, quantity);
+        products.add(latest);
+        Activity mostRecent = new Activity("AddToStock", quantity);
+        latest.addActivity(mostRecent);
+        
+        return "Added product '" + name + "' with ID " + latest.getProductId() + " and initial quantity " + quantity + ".";
+    }
+    
+    public String deleteProduct(int ID)
+            // Binary search. Note that products are already sorted by ID.
+    {
+       int left = 0;
+       int right = products.size() - 1;
+       
+       while (left <= right)
+       {
+           int mid = left + (right - left) / 2;
+           Product midProduct = products.get(mid);
+           int midId = midProduct.getProductId();
+           
+           if (midId == ID)
+           {
+               products.remove(mid);
+               return "Product " + ID + " deleted successfully.";
+           }
+           else if (midId < ID)
+           {
+               left = mid + 1;
+           }
+           else
+           {
+               right = mid - 1;
+           }
+       }
+       return "Product " + ID + " not found.";
+    }
+    
+    public String displayMostRecentActivities(int ID)
+    {
+        
+        StringBuilder sb = new StringBuilder();
+        
+      for (Product product1 : products)
+      {
+          if (product1.getProductId() == ID)
+          {
+              sb.append("Activities for Product ").append(ID).append(":\n");
+              
+              Activity[] acts = product1.getActivities();
+              int n = acts.length;
+              
+              if (n == 0)
+              {
+                  sb.append("No activities recorded.\n");
+                  return sb.toString();
+              }
+              
+              // Merge sort (descending order by activity quantity)
+              if (n > 1)
+              {
+                  mergeSortActivities(acts, 0, n - 1);
+              }
+              
+              // Display sorted activities
+              for (int i = 0; i < n; i++)
+              {
+                      Activity a = acts[i];
+                      sb.append("Activity ID: ").append(a.getActivityId()).append("\n");
+                      sb.append("Type: ").append(a.getActivityName()).append("\n");
+                      sb.append("Quantity: ").append(a.getActivityQuantity()).append("\n");
+                      sb.append("Date: ").append(a.getActivityDate()).append("\n");
+                      sb.append("-----------------------\n");
+              }
+              return sb.toString();
+          }
+      }
+      return "Product " + ID + " not found.";
+    }
+    
+    // Save using Serialization
+    
+    public String saveToFile(String filename)
+    {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename)))
+        {
+            out.writeObject(this);
+            return "Database saved successfully to " + filename;
+        } catch (IOException e)
+        {
+            return "Error saving database: " + e.getMessage();
+        }
+    }
+    
+    // Load using Serialization
+    
+    public static InventorySystem loadFromFile(String filename)
+    {
+       try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename)))
+       {
+           InventorySystem db = (InventorySystem) in.readObject();
+           db.recomputeNextIds();
+           return db;
+       } catch (IOException | ClassNotFoundException e)
+       {
+           return new InventorySystem();
+       }
+    }
+    
+    // Recomputing next IDs after load
+    
+    public void recomputeNextIds()
+    {
+        int maxProd = 0;
+        int maxAct = 0;
+        for (Product p: products)
+        {
+            if (p.getProductId() > maxProd) 
+            {
+                maxProd = p.getProductId();
+            }
+            for (Activity a : p.getActivities())
+            {
+                if (a.getActivityId() > maxAct)
+                {
+                    maxAct = a.getActivityId();
+                }
+            }
+        }
+        Product.nextProductId = maxProd + 1;
+        Activity.nextActivityId = maxAct + 1;
+    }     
+    
+    public java.util.List<Product> getProducts()
+    {
+        return products;
+    }
+    
+    private void mergeSortActivities(Activity[] arr, int left, int right)
+    {
+        if (left >= right)
+        {
+           return;
+        }
+        
+        int mid = left + (right - left) / 2;
+        
+        mergeSortActivities(arr, left, mid);
+        mergeSortActivities(arr, mid + 1, right);
+        
+        mergeActivities(arr, left, mid, right);
+                           
+    }
+    
+    private void mergeActivities(Activity[] arr, int left, int mid, int right)
+    {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+        
+        Activity[] L = new Activity[n1];
+        Activity[] R = new Activity[n2];
+        
+        // Copy data to temporary arrays
+        for (int i = 0; i < n1; i++)
+        {
+            L[i] = arr[left + i];
+        }
+        for (int j = 0; j < n2; j++)
+        {
+            R[j] = arr[mid + 1 + j];
+        }
+        
+        int i = 0, j = 0;
+        int k = left;
+        
+        // Merge the two temporary arrays
+        while (i < n1 && j < n2)
+        {
+            if (L[i].getActivityQuantity() >= R[j].getActivityQuantity())
+            {
+                arr[k] = L[i];
+                i++;       
+            }
+            else 
+            {
+                arr[k] = R[j];
+                j++;
+            }
+            k++;
+        }
+        // Copy remaining elements of L[], if any
+        while (i < n1)
+        {
+            arr[k] = L[i];
+            i++;
+            k++;
+        }
+        // Copy remaining elements of R[], if any
+        while (j < n2)
+        {
+            arr[k] = R[j];
+            j++;
+            k++;
+        }
+    }
+}
