@@ -1,0 +1,76 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package CS5003;
+
+/**
+ *
+ * @author Daniel O'Sullivan, Hardik Pandit, Awad Saad
+ */
+
+import java.io.Serializable;
+import java.util.Arrays;
+
+public class CustomArray implements Serializable {
+    
+    // Serial number for serialization
+    
+    private static final long serialVersionUID = 1L;
+    
+    // Attributes
+    
+    private Activity[] data;
+    private int count;
+    
+    public CustomArray(int capacity)
+    {
+        if (capacity <= 0)
+        {
+            throw new IllegalArgumentException("Capacity must be positive");
+        }
+        data = new Activity[capacity];
+        count = 0;
+        
+    }
+
+public void add(Activity activity)
+{
+    if (activity == null)
+    {
+        throw new IllegalArgumentException("Activity cannot be null");
+    }
+    
+    if (count < data.length)
+    {
+        data[count] = activity;
+        count++;        
+    }
+    else 
+    {
+        for (int i = 1; i< data.length; i++)
+        {
+            data[i - 1] = data[i];
+        }
+        data[data.length - 1] = activity;
+    }
+}
+    public int size()
+    {
+        return count;
+    }
+    
+    public Activity get(int index)
+    {
+        if (index < 0 || index >= count)
+        {
+            throw new IndexOutOfBoundsException("Index: " + index);
+        }
+        return data[index];
+    }
+    
+    public Activity[] toArray()
+    {
+        return Arrays.copyOf(data, count);
+    }
+}
