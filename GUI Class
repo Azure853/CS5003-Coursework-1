@@ -12,10 +12,11 @@ package CS5003;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class ProductGUI extends JFrame {
     
-    private Database database = new Database();
+    private InventorySystem database = new InventorySystem();
     
     // Inputs
     
@@ -27,13 +28,15 @@ public class ProductGUI extends JFrame {
     
     // Output area
     
-    private final JTextArea output = new JTextArea(16,60);
+    private final JTextArea output = new JTextArea(20,80);
     
     public ProductGUI()
     {
         super("Product Manager");
         
-        setLayout(new GridLayout(0, 1, 5, 5));
+        setLayout(new BorderLayout(5, 5));
+        
+        JPanel topPanel = new JPanel(new GridLayout(0,1,5,5));
         
         // Row 1: Add product
         JPanel addPanel = new JPanel();
@@ -42,18 +45,32 @@ public class ProductGUI extends JFrame {
         addPanel.add(new JLabel("Qty:"));
         addPanel.add(qtyField);
         JButton addBtn = new JButton("Add Product");
-        addBtn.addActionListener(this::onAddProduct);
+        addBtn.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                onAddProduct(e);
+            }
+        });
         addPanel.add(addBtn);
-        add(addPanel);
+        topPanel.add(addPanel);
         
         // Row 2: Delete product
         JPanel deletePanel = new JPanel();
         deletePanel.add(new JLabel("Product ID:"));
         deletePanel.add(idField);
         JButton deleteBtn = new JButton("Delete");
-        deleteBtn.addActionListener(this::onDeleteProduct);
+        deleteBtn.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                onDeleteProduct(e);
+            }
+        });
         deletePanel.add(deleteBtn);
-        add(deletePanel);
+        topPanel.add(deletePanel);
         
         // Row 3: Add activity
         JPanel actPanel = new JPanel();
@@ -62,29 +79,74 @@ public class ProductGUI extends JFrame {
         actPanel.add(new JLabel("Qty:"));
         actPanel.add(actQtyField);
         JButton actBtn = new JButton("Apply Activity");
-        actBtn.addActionListener(this::onAddActivity);
+        actBtn.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                onAddActivity(e);
+            }
+        });
         actPanel.add(actBtn);
-        add(actPanel);
+        topPanel.add(actPanel);
         
         // Row 4: Display buttons
         JPanel dispPanel = new JPanel();
         JButton showAllBtn = new JButton("Display All");
-        showAllBtn.addActionListener(this::onDisplayAll);
+        showAllBtn.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                onDisplayAll(e);
+            }
+        });
         JButton showActsBtn = new JButton("Show Last 4 (Sorted)");
-        showActsBtn.addActionListener(this::onShowActivities);
+        showActsBtn.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                onShowActivities(e);
+            }
+        });
         dispPanel.add(showAllBtn);
         dispPanel.add(showActsBtn);
-        add(dispPanel);
+        topPanel.add(dispPanel);
         
         // Row 5: Save / Load
-        JPanel ioPanel = new JPanel();
-        JButton saveBtn = new JButton("Save");
-       saveBtn.addActionListener(e -> database.saveToFile("database.ser"));
+       JPanel ioPanel = new JPanel();
+       JButton saveBtn = new JButton("Save");
+       saveBtn.addActionListener(new ActionListener()
+               {
+                   @Override
+                   public void actionPerformed(ActionEvent e)
+                   {
+                       String msg = database.saveToFile("database.ser");
+                       appendOutput(msg);
+                   }
+       });
        JButton loadBtn = new JButton("Load");
-       loadBtn.addActionListener(e -> database = Database.loadFromFile("database.ser"));
+       loadBtn.addActionListener(new ActionListener()
+       {
+       @Override
+       public void actionPerformed(ActionEvent e)
+       {
+           database = InventorySystem.loadFromFile("database.ser");
+           appendOutput("Database loaded from database.ser");
+       }
+       });
        ioPanel.add(saveBtn);
        ioPanel.add(loadBtn);
-       add(ioPanel);
+       topPanel.add(ioPanel);
+       
+       add(topPanel, BorderLayout.NORTH);
+       
+       output.setEditable(false);
+       output.setLineWrap(true);
+       output.setWrapStyleWord(true);
+       JScrollPane scroll = new JScrollPane(output);
+       add(scroll, BorderLayout.CENTER);
         
        // Final frame settings
        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -101,11 +163,11 @@ public class ProductGUI extends JFrame {
         try { 
            String name = nameField.getText().trim();
            int qty = Integer.parseInt(qtyField.getText().trim());
-           database.addProduct(name, qty);
-           System.out.println("Add product: " + name + " (" + qty + ")");
+           String msg = database.addProduct(name, qty);
+           appendOutput(msg);
         } catch (Exception ex)
         {
-            System.out.println("Invalid input for product");
+            appendOutput("Invalid input for product");
         }
     }
     
@@ -114,10 +176,11 @@ public class ProductGUI extends JFrame {
         try 
         {
            int id = Integer.parseInt(idField.getText().trim());
-           database.deleteProduct(id);
+           String msg = database.deleteProduct(id);
+           appendOutput(msg);
         } catch (NumberFormatException ex)
         {
-            System.out.println("Invalid product ID.");
+            appendOutput("Invalid product ID.");
         }
     }
     
@@ -132,12 +195,16 @@ public class ProductGUI extends JFrame {
          Product p = null;
          for (Product prod : database.getProducts())
          {
-             if (prod.getProductId() == id) p = prod;
+             if (prod.getProductId() == id)
+             {
+                 p = prod;
+                 break;
+             }
          }
          
          if (p == null)
          {
-             System.out.println("Product not found");
+             appendOutput("Product not found");
              return;
          }
          
@@ -149,7 +216,7 @@ public class ProductGUI extends JFrame {
          {
              if (qty > p.getProductQuantity())
              {
-                 System.out.println("Error: insufficient quantity");
+                 appendOutput("Error: insufficient quantity");
                  return;
              }
              p.setProductQuantity(p.getProductQuantity() - qty);
@@ -157,16 +224,18 @@ public class ProductGUI extends JFrame {
          
          Activity a = new Activity(type, qty);
          p.addActivity(a);
-         System.out.println("Applied activity " + type + " (" + qty + ") to product " + id);
+         appendOutput("Applied activity " + type + " (" + qty + ") to product " + id);
         } catch (Exception ex)
         {
-            System.out.println("Invalid input for activity");
+            appendOutput("Invalid input for activity");
         }
     }
     
     private void onDisplayAll(ActionEvent e)
     {
-        database.displayAll();
+        clearOutput();
+        String result = database.displayAll();
+        appendOutput(result);
     }
     
     private void onShowActivities(ActionEvent e)
@@ -174,15 +243,26 @@ public class ProductGUI extends JFrame {
         try 
         {
          int id = Integer.parseInt(idField.getText().trim());
-         database.displayMostRecentActivities(id);
+         String result = database.displayMostRecentActivities(id);
+         appendOutput(result);
         } catch (Exception ex) 
         {
-            System.out.println("Invalid product ID");
+            appendOutput("Invalid product ID");
         }
     }
     
     public static void main(String[] args)
     {
         new ProductGUI();
+    }
+    
+    private void clearOutput()
+    {
+        output.setText("");
+    }
+    
+    private void appendOutput(String text)
+    {
+        output.append(text + "\n");
     }
 }
