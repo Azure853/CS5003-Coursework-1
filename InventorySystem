@@ -257,4 +257,22 @@ public class InventorySystem implements Serializable {
             k++;
         }
     }
+    
+    public String displayProductById(int id)
+    {
+        for (Product p : products)
+        {
+            if(p.getProductId() == id)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Product ID: ").append(p.getProductId()).append("\n");
+                sb.append("Name: ").append(p.getProductName()).append("\n");
+                sb.append("Date Added: ").append(p.getEntryDate()).append("\n");
+                sb.append("Quantity: ").append(p.getProductQuantity()).append("\n");
+                sb.append("------------------------\n");
+                return sb.toString();
+            }
+        }
+        return "Product " + id + " not found.";
+    }
 }
