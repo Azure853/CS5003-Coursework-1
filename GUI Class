@@ -92,6 +92,8 @@ public class ProductGUI extends JFrame {
         
         // Row 4: Display buttons
         JPanel dispPanel = new JPanel();
+        
+        // Display all products
         JButton showAllBtn = new JButton("Display All");
         showAllBtn.addActionListener(new ActionListener()
         {
@@ -101,6 +103,19 @@ public class ProductGUI extends JFrame {
                 onDisplayAll(e);
             }
         });
+        
+        // Display a single product by ID
+        JButton showProductBtn = new JButton("Display Product");
+        showProductBtn.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                onDisplayProduct(e);
+            }
+        });
+        
+        // Show last 4 activities
         JButton showActsBtn = new JButton("Show Last 4 (Sorted)");
         showActsBtn.addActionListener(new ActionListener()
         {
@@ -111,6 +126,7 @@ public class ProductGUI extends JFrame {
             }
         });
         dispPanel.add(showAllBtn);
+        dispPanel.add(showProductBtn);
         dispPanel.add(showActsBtn);
         topPanel.add(dispPanel);
         
@@ -264,5 +280,20 @@ public class ProductGUI extends JFrame {
     private void appendOutput(String text)
     {
         output.append(text + "\n");
+    }
+    
+    private void onDisplayProduct(ActionEvent e)
+    {
+        try 
+        {
+            int id = Integer.parseInt(idField.getText().trim());
+            clearOutput();
+            String result = database.displayProductById(id);
+            appendOutput(result);
+        }
+        catch (NumberFormatException ex)
+        {
+            appendOutput("Invalid product ID.");
+        }
     }
 }
